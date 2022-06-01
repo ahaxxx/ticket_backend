@@ -1,13 +1,13 @@
 package main
 
 import (
-	"ticket-backed/database"
-	"ticket-backed/router"
+	"os"
+	"ticket-backed/cmd"
 )
 
 func main() {
-	db := database.InitDB()
-	defer db.Close()
-	r := router.NewRouter()
-	r.Run(":3000")
+	if err := cmd.Execute(); err != nil {
+		println("start fail: ", err.Error())
+		os.Exit(-1)
+	}
 }
