@@ -78,9 +78,7 @@ func UserRegister(c *gin.Context) {
 	db.DB.Create(&user)
 	// 返回结果
 
-	c.JSON(utils.NewSucc("Register Success!", gin.H{
-		"msg": "注册成功!",
-	}))
+	c.JSON(utils.NewSucc("注册成功!", gin.H{}))
 }
 
 //
@@ -98,7 +96,7 @@ func UserLogin(c *gin.Context) {
 	if len(phone) != 11 {
 		c.JSON(http.StatusUnprocessableEntity, gin.H{
 			"code": 422,
-			"msg":  "The phone number must be 11 digits!",
+			"msg":  "手机号必须为11位!",
 		})
 		return
 	}
@@ -106,23 +104,39 @@ func UserLogin(c *gin.Context) {
 	if len(password) < 6 { // 密码不能小于六位
 		c.JSON(http.StatusUnprocessableEntity, gin.H{
 			"code": 422,
-			"msg":  "The password must be longer than 6 digits!",
+			"msg":  "密码必须为大于6位!",
 		})
 		return
 	}
 
 	// 判断账户是否存在
-	if dao.IsPhoneExist(phone) {
+	var user model.User
+	db.DB.Where("phone=?", phone).First(&user)
+	if user.ID == 0 {
 		c.JSON(http.StatusUnprocessableEntity, gin.H{
 			"code": 422,
-			"msg":  "Phone existed!",
+			"msg":  "用户不存在!",
 		})
 		return
 	}
 
 	// 判断密码是否正确
 
-	// 发放token
+	err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(password))
 
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"code": 400,
+			"msg":  "密码错误!",
+		})
+		return
+	}
+
+	// 发放token
+	token := "11"
 	// 返回结果
+	c.JSON(utils.NewSucc("登录成功", gin.H{
+		"token": token,
+	}))
+	return
 }
