@@ -1,4 +1,4 @@
-module ticket-backed
+module ticket-backend
 
 go 1.18
 
