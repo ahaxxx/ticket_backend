@@ -10,8 +10,7 @@ import (
 var jwtKey = []byte(viper.GetString("jwt.key"))
 
 type Claims struct {
-	Username string `json:"username"`
-	Password string `json:"password"`
+	UserId uint `json:"user_id"`
 	jwt.StandardClaims
 }
 
@@ -25,8 +24,7 @@ type Claims struct {
 func ReleaseUserToken(user model.User) (string, error) {
 	expirationTime := time.Now().Add(7 * 24 * time.Hour) // 有效期7天
 	claims := Claims{
-		Username: user.Name,
-		Password: user.Password,
+		UserId: user.ID,
 		StandardClaims: jwt.StandardClaims{
 			ExpiresAt: expirationTime.Unix(),
 			IssuedAt:  time.Now().Unix(),
@@ -40,4 +38,12 @@ func ReleaseUserToken(user model.User) (string, error) {
 		return "", err
 	}
 	return token, err
+}
+
+func ParseUserTokenString(tokenString string) (*jwt.Token, *Claims, error) {
+	claims := &Claims{}
+	token, err := jwt.ParseWithClaims(tokenString, claims, func(token *jwt.Token) (i interface{}, err error) {
+		return jwtKey, nil
+	})
+	return token, claims, err
 }
