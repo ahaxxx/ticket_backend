@@ -5,6 +5,7 @@ import (
 	"golang.org/x/crypto/bcrypt"
 	"log"
 	"net/http"
+	"ticket-backend/common"
 	"ticket-backend/dao"
 	db "ticket-backend/database"
 	"ticket-backend/model"
@@ -133,7 +134,15 @@ func UserLogin(c *gin.Context) {
 	}
 
 	// 发放token
-	token := "11"
+	token, err := common.ReleaseUserToken(user)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"code": 500,
+			"msg":  "系统错误!",
+		})
+		log.Println("token generate error:%v", err)
+		return
+	}
 	// 返回结果
 	c.JSON(utils.NewSucc("登录成功", gin.H{
 		"token": token,
