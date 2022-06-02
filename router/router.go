@@ -10,7 +10,7 @@ func NewRouter() *gin.Engine {
 	r.GET("/ping", controller.Ping)
 	v1 := r.Group("/api/v1")
 	{
-		v1.POST("user/register", controller.UserRegister)
+		v1.POST("user/register", controller.UserRegister) // 用户注册接口
 	}
 	return r
 }

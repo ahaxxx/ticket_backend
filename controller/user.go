@@ -4,6 +4,9 @@ import (
 	"github.com/gin-gonic/gin"
 	"log"
 	"net/http"
+	"ticket-backed/dao"
+	db "ticket-backed/database"
+	"ticket-backed/model"
 	"ticket-backed/utils"
 )
 
@@ -35,8 +38,30 @@ func UserRegister(c *gin.Context) {
 		name = utils.RandStr(10)
 	}
 	log.Println(name, password, phone)
-	// 创建用户
 
+	if dao.IsPhoneExist(phone) {
+		c.JSON(http.StatusUnprocessableEntity, gin.H{
+			"code": 422,
+			"msg":  "Phone existed!",
+		})
+		return
+	}
+
+	if dao.IsNameExist(name) {
+		c.JSON(http.StatusUnprocessableEntity, gin.H{
+			"code": 422,
+			"msg":  "Name existed!",
+		})
+		return
+	}
+
+	// 创建用户
+	user := model.User{
+		Name:     name,
+		Password: password,
+		Phone:    phone,
+	}
+	db.DB.Create(&user)
 	// 返回结果
 
 	c.JSON(utils.NewSucc("Register Success!", gin.H{
