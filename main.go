@@ -2,7 +2,7 @@ package main
 
 import (
 	"os"
-	"ticket-backed/cmd"
+	"ticket-backend/cmd"
 )
 
 func main() {

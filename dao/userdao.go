@@ -1,8 +1,8 @@
 package dao
 
 import (
-	db "ticket-backed/database"
-	"ticket-backed/model"
+	db "ticket-backend/database"
+	"ticket-backend/model"
 )
 
 //
