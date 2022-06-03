@@ -3,6 +3,7 @@ package controller
 import (
 	"github.com/gin-gonic/gin"
 	"net/http"
+	"ticket-backend/dao"
 	db "ticket-backend/database"
 	"ticket-backend/dto"
 	"ticket-backend/model"
@@ -50,4 +51,22 @@ func PassengerAdd(c *gin.Context) {
 	}
 	db.DB.Create(&passenger)
 	response.Response(c, http.StatusOK, 200, nil, "乘客添加成功")
+}
+
+//
+//  PassengerList
+//  @Description: 获取乘客列表接口
+//  @param c
+//
+func PassengerList(c *gin.Context) {
+	user, _ := c.Get("user")
+	uid := dto.ToUserDto(user.(model.User)).Id
+	passengers := dao.GetPassengerList(uid)
+	data := gin.H{
+		"passengers": passengers,
+	}
+	if len(passengers) == 0 {
+		response.Response(c, http.StatusNotFound, 404, nil, "列表为空")
+	}
+	response.Response(c, http.StatusOK, 200, data, "乘客列表获取成功")
 }
