@@ -9,6 +9,5 @@ type Passenger struct {
 	Phone    string `gorm:"type:varchar(255);not null",json:"phone"`
 	Sex      string `gorm:"type:varchar(255);not null",json:"sex"`
 	Workunit string `gorm:"type:varchar(255);not null",json:"workunit"`
-	User     User   `gorm:"ForeignKey:UID"`
 	UID      uint
 }
