@@ -7,6 +7,7 @@ import (
 	"ticket-backend/common"
 	db "ticket-backend/database"
 	"ticket-backend/model"
+	"ticket-backend/response"
 )
 
 func UserAuthMiddleware() gin.HandlerFunc {
@@ -14,20 +15,14 @@ func UserAuthMiddleware() gin.HandlerFunc {
 		// 获取authorization header
 		tokenString := c.GetHeader("Authorization")
 		if tokenString == "" || !strings.HasPrefix(tokenString, "Bearer") {
-			c.JSON(http.StatusUnauthorized, gin.H{
-				"code": 401,
-				"msg":  "权限不够",
-			})
+			response.Response(c, http.StatusUnauthorized, 401, nil, "权限不够！")
 			c.Abort()
 			return
 		}
 		tokenString = tokenString[7:]
 		token, claims, err := common.ParseUserTokenString(tokenString)
-		if err != nil || token.Valid {
-			c.JSON(http.StatusUnauthorized, gin.H{
-				"code": 401,
-				"msg":  "权限不够",
-			})
+		if err != nil || !token.Valid {
+			response.Response(c, http.StatusUnauthorized, 401, nil, "权限不够！")
 			c.Abort()
 			return
 		}
@@ -36,10 +31,7 @@ func UserAuthMiddleware() gin.HandlerFunc {
 		var user model.User
 		db.DB.First(&user, userId)
 		if user.ID == 0 {
-			c.JSON(http.StatusUnauthorized, gin.H{
-				"code": 401,
-				"msg":  "权限不够",
-			})
+			response.Response(c, http.StatusUnauthorized, 401, nil, "权限不够！")
 			c.Abort()
 			return
 		}
