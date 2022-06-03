@@ -6,3 +6,5 @@ db:
   username: root
   password: root
   dbname: ticket
+jwt:
+  key: i7a6S8OFBGZjTCYKE6Rypipn6rugG7KR

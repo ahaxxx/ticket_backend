@@ -5,9 +5,12 @@ import (
 	"golang.org/x/crypto/bcrypt"
 	"log"
 	"net/http"
+	"ticket-backend/common"
 	"ticket-backend/dao"
 	db "ticket-backend/database"
+	"ticket-backend/dto"
 	"ticket-backend/model"
+	"ticket-backend/response"
 	"ticket-backend/utils"
 )
 
@@ -25,18 +28,12 @@ func UserRegister(c *gin.Context) {
 
 	// 数据验证
 	if len(phone) != 11 {
-		c.JSON(http.StatusUnprocessableEntity, gin.H{
-			"code": 422,
-			"msg":  "电话号码必须为11位!",
-		})
+		response.Response(c, http.StatusUnprocessableEntity, 422, nil, "电话号码必须为11位!")
 		return
 	}
 
 	if len(password) < 6 { // 密码不能小于六位
-		c.JSON(http.StatusUnprocessableEntity, gin.H{
-			"code": 422,
-			"msg":  "密码长度必须大于6位!",
-		})
+		response.Response(c, http.StatusUnprocessableEntity, 422, nil, "密码长度必须大于6位!")
 		return
 	}
 
@@ -46,27 +43,19 @@ func UserRegister(c *gin.Context) {
 	log.Println(name, password, phone)
 
 	if dao.IsPhoneExist(phone) {
-		c.JSON(http.StatusUnprocessableEntity, gin.H{
-			"code": 422,
-			"msg":  "电话号码已经存在!",
-		})
+		response.Response(c, http.StatusUnprocessableEntity, 422, nil, "电话号码已经存在!")
 		return
 	}
 
 	if dao.IsNameExist(name) {
-		c.JSON(http.StatusUnprocessableEntity, gin.H{
-			"code": 422,
-			"msg":  "用户名已经存在!",
-		})
+		response.Response(c, http.StatusUnprocessableEntity, 422, nil, "用户名已经存在!")
 		return
 	}
 	// 对密码取哈希
 	hashPass, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"code": 500,
-			"msg":  "密码加密错误",
-		})
+		response.Response(c, http.StatusInternalServerError, 500, nil, "密码加密错误!")
+		return
 	}
 
 	// 创建用户
@@ -77,8 +66,7 @@ func UserRegister(c *gin.Context) {
 	}
 	db.DB.Create(&user)
 	// 返回结果
-
-	c.JSON(utils.NewSucc("注册成功!", gin.H{}))
+	response.Response(c, http.StatusOK, 200, nil, "注册成功!")
 }
 
 //
@@ -94,18 +82,12 @@ func UserLogin(c *gin.Context) {
 
 	// 数据验证
 	if len(phone) != 11 {
-		c.JSON(http.StatusUnprocessableEntity, gin.H{
-			"code": 422,
-			"msg":  "手机号必须为11位!",
-		})
+		response.Response(c, http.StatusUnprocessableEntity, 422, nil, "电话号码必须为11位!")
 		return
 	}
 
 	if len(password) < 6 { // 密码不能小于六位
-		c.JSON(http.StatusUnprocessableEntity, gin.H{
-			"code": 422,
-			"msg":  "密码必须为大于6位!",
-		})
+		response.Response(c, http.StatusUnprocessableEntity, 422, nil, "密码长度必须大于6位!")
 		return
 	}
 
@@ -113,10 +95,7 @@ func UserLogin(c *gin.Context) {
 	var user model.User
 	db.DB.Where("phone=?", phone).First(&user)
 	if user.ID == 0 {
-		c.JSON(http.StatusUnprocessableEntity, gin.H{
-			"code": 422,
-			"msg":  "用户不存在!",
-		})
+		response.Response(c, http.StatusUnprocessableEntity, 422, nil, "用户不存在!")
 		return
 	}
 
@@ -125,18 +104,29 @@ func UserLogin(c *gin.Context) {
 	err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(password))
 
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"code": 400,
-			"msg":  "密码错误!",
-		})
+		response.Response(c, http.StatusBadRequest, 400, nil, "密码错误!")
 		return
 	}
 
 	// 发放token
-	token := "11"
+	token, err := common.ReleaseUserToken(user)
+	if err != nil {
+		response.Response(c, http.StatusInternalServerError, 500, nil, "token分发失败!")
+		log.Println("token generate error:%v", err)
+		return
+	}
 	// 返回结果
-	c.JSON(utils.NewSucc("登录成功", gin.H{
+	data := gin.H{
 		"token": token,
-	}))
+	}
+	response.Success(c, data, "用户信息获取成功！")
 	return
+}
+
+func UserInfo(c *gin.Context) {
+	user, _ := c.Get("user")
+	data := gin.H{
+		"user": dto.ToUserDto(user.(model.User)),
+	}
+	response.Success(c, data, "消息获取成功！")
 }
