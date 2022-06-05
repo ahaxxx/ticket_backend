@@ -113,6 +113,7 @@ func PassengerUpdate(c *gin.Context) {
 		response.Response(c, http.StatusUnauthorized, 401, nil, "权限不够！")
 		return
 	}
+	// 添加记录
 	update := model.Passenger{
 		Name:     name,
 		Idnum:    idnum,
@@ -125,5 +126,22 @@ func PassengerUpdate(c *gin.Context) {
 }
 
 func PassengerDelete(c *gin.Context) {
-
+	// 获取数据
+	user, _ := c.Get("user")
+	id, err := strconv.Atoi(c.PostForm("id"))
+	if err != nil {
+		response.Response(c, http.StatusUnprocessableEntity, 422, nil, "id参数错误!")
+		return
+	}
+	var idn = uint(id)
+	// 权限验证
+	passenger := dao.GetPassengerById(idn)
+	uid := dto.ToUserDto(user.(model.User)).Id
+	if uid != passenger.UID {
+		response.Response(c, http.StatusUnauthorized, 401, nil, "权限不够！")
+		return
+	}
+	// 删除记录
+	dao.DeletePassengerById(idn)
+	response.Response(c, http.StatusOK, 200, nil, "乘客信息删除成功！")
 }

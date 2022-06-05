@@ -20,3 +20,8 @@ func GetPassengerById(id uint) model.Passenger {
 func UpdatePassengerById(id uint, passenger model.Passenger) {
 	db.DB.Model(&model.Passenger{}).Where("id=?", id).Update(&passenger)
 }
+
+func DeletePassengerById(id uint) {
+	var passenger model.Passenger
+	db.DB.Where("id = ?", id).Delete(&passenger)
+}
