@@ -9,6 +9,7 @@ import (
 	"ticket-backend/common"
 	"ticket-backend/dao"
 	db "ticket-backend/database"
+	"ticket-backend/dto"
 	"ticket-backend/model"
 	"ticket-backend/response"
 )
@@ -117,4 +118,12 @@ func AdminLogin(c *gin.Context) {
 	}
 	response.Success(c, data, "后台登录成功！")
 	return
+}
+
+func AdminInfo(c *gin.Context) {
+	admin, _ := c.Get("admin")
+	data := gin.H{
+		"admin": dto.ToAdminDto(admin.(model.Admin)),
+	}
+	response.Success(c, data, "用户信息获取成功！")
 }

@@ -119,7 +119,7 @@ func UserLogin(c *gin.Context) {
 	data := gin.H{
 		"token": token,
 	}
-	response.Success(c, data, "用户信息获取成功！")
+	response.Success(c, data, "用户登录成功！")
 	return
 }
 
@@ -128,5 +128,5 @@ func UserInfo(c *gin.Context) {
 	data := gin.H{
 		"user": dto.ToUserDto(user.(model.User)),
 	}
-	response.Success(c, data, "用户登录成功！")
+	response.Success(c, data, "用户信息获取成功！")
 }

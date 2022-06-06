@@ -23,6 +23,7 @@ func NewRouter() *gin.Engine {
 
 		v1.POST("admin/register", middlewave.AdminAuthMiddleware(), controller.AdminRegister) // 注册后台用户
 		v1.POST("admin/login", controller.AdminLogin)                                         // 后台用户登录
+		v1.GET("admin", middlewave.AdminAuthMiddleware(), controller.AdminInfo)               // 用户信息接口
 	}
 	return r
 }
