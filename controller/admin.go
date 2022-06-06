@@ -7,7 +7,9 @@ import (
 	"net/http"
 	"strconv"
 	"ticket-backend/common"
+	"ticket-backend/dao"
 	db "ticket-backend/database"
+	"ticket-backend/dto"
 	"ticket-backend/model"
 	"ticket-backend/response"
 )
@@ -40,18 +42,15 @@ func AdminRegister(c *gin.Context) {
 		response.Response(c, http.StatusUnprocessableEntity, 422, nil, "请输入用户名!")
 		return
 	}
-	// 数据存在性验证
-	/**
-	if dao.IsPhoneExist(phone) {
+	if dao.IsAdminPhoneExist(phone) {
 		response.Response(c, http.StatusUnprocessableEntity, 422, nil, "电话号码已经存在!")
 		return
 	}
 
-	if dao.IsNameExist(name) {
+	if dao.IsAdminNameExist(name) {
 		response.Response(c, http.StatusUnprocessableEntity, 422, nil, "用户名已经存在!")
 		return
 	}
-	**/
 	// 对密码取哈希
 	hashPass, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
 	if err != nil {
@@ -119,4 +118,12 @@ func AdminLogin(c *gin.Context) {
 	}
 	response.Success(c, data, "后台登录成功！")
 	return
+}
+
+func AdminInfo(c *gin.Context) {
+	admin, _ := c.Get("admin")
+	data := gin.H{
+		"admin": dto.ToAdminDto(admin.(model.Admin)),
+	}
+	response.Success(c, data, "用户信息获取成功！")
 }
