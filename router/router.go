@@ -20,6 +20,8 @@ func NewRouter() *gin.Engine {
 		v1.POST("passenger/info", middlewave.UserAuthMiddleware(), controller.PassengerInfo) // 获取乘客列表
 		v1.PUT("passenger", middlewave.UserAuthMiddleware(), controller.PassengerUpdate)     // 修改乘客信息
 		v1.DELETE("passenger", middlewave.UserAuthMiddleware(), controller.PassengerDelete)  // 删除乘客
+
+		v1.POST("admin/register", controller.AdminRegister) // 注册后台用户
 	}
 	return r
 }

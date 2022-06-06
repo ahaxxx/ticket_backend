@@ -11,7 +11,7 @@ import (
 //  @param phone
 //  @return bool
 //
-func IsPhoneExist(phone string) bool {
+func IsUserPhoneExist(phone string) bool {
 	var user model.User
 	db.DB.Where("phone=?", phone).First(&user)
 	if user.ID != 0 {
@@ -26,7 +26,7 @@ func IsPhoneExist(phone string) bool {
 //  @param name
 //  @return bool
 //
-func IsNameExist(name string) bool {
+func IsUserNameExist(name string) bool {
 	var user model.User
 	db.DB.Where("name=?", name).First(&user)
 	if user.ID != 0 {

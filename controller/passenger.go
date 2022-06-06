@@ -62,7 +62,7 @@ func PassengerAdd(c *gin.Context) {
 func PassengerList(c *gin.Context) {
 	user, _ := c.Get("user")
 	uid := dto.ToUserDto(user.(model.User)).Id
-	passengers := dao.GetPassengerList(uid)
+	passengers := dao.GetPassengerListByUid(uid)
 	data := gin.H{
 		"passengers": passengers,
 	}

@@ -42,12 +42,12 @@ func UserRegister(c *gin.Context) {
 	}
 	log.Println(name, password, phone)
 
-	if dao.IsPhoneExist(phone) {
+	if dao.IsUserPhoneExist(phone) {
 		response.Response(c, http.StatusUnprocessableEntity, 422, nil, "电话号码已经存在!")
 		return
 	}
 
-	if dao.IsNameExist(name) {
+	if dao.IsUserNameExist(name) {
 		response.Response(c, http.StatusUnprocessableEntity, 422, nil, "用户名已经存在!")
 		return
 	}
