@@ -72,6 +72,11 @@ func PassengerList(c *gin.Context) {
 	response.Response(c, http.StatusOK, 200, data, "乘客列表获取成功")
 }
 
+//
+//  PassengerUpdate
+//  @Description: 更新乘客信息
+//  @param c
+//
 func PassengerUpdate(c *gin.Context) {
 	// 表单数据获取
 	user, _ := c.Get("user")
@@ -125,6 +130,11 @@ func PassengerUpdate(c *gin.Context) {
 	response.Response(c, http.StatusOK, 200, nil, "乘客信息修改成功！")
 }
 
+//
+//  PassengerDelete
+//  @Description: 删除乘客信息
+//  @param c
+//
 func PassengerDelete(c *gin.Context) {
 	// 获取数据
 	user, _ := c.Get("user")
@@ -144,4 +154,28 @@ func PassengerDelete(c *gin.Context) {
 	// 删除记录
 	dao.DeletePassengerById(idn)
 	response.Response(c, http.StatusOK, 200, nil, "乘客信息删除成功！")
+}
+
+func PassengerInfo(c *gin.Context) {
+	// 获取数据
+	user, _ := c.Get("user")
+	id, err := strconv.Atoi(c.PostForm("id"))
+	if err != nil {
+		response.Response(c, http.StatusUnprocessableEntity, 422, nil, "id参数错误!")
+		return
+	}
+	var idn = uint(id)
+	// 权限验证
+	passenger := dao.GetPassengerById(idn)
+	uid := dto.ToUserDto(user.(model.User)).Id
+	if uid != passenger.UID {
+		response.Response(c, http.StatusUnauthorized, 401, nil, "权限不够！")
+		return
+	}
+	// 删除记录
+	info := dao.GetPassengerById(idn)
+	data := gin.H{
+		"info": info,
+	}
+	response.Response(c, http.StatusOK, 200, data, "乘客信息查询成功！")
 }
