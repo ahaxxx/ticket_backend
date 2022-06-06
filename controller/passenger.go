@@ -118,7 +118,7 @@ func PassengerUpdate(c *gin.Context) {
 		response.Response(c, http.StatusUnauthorized, 401, nil, "权限不够！")
 		return
 	}
-	// 添加记录
+	// 修改记录
 	update := model.Passenger{
 		Name:     name,
 		Idnum:    idnum,
