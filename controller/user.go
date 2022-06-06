@@ -128,5 +128,5 @@ func UserInfo(c *gin.Context) {
 	data := gin.H{
 		"user": dto.ToUserDto(user.(model.User)),
 	}
-	response.Success(c, data, "消息获取成功！")
+	response.Success(c, data, "用户登录成功！")
 }
