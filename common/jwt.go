@@ -9,8 +9,13 @@ import (
 
 var jwtKey = []byte(viper.GetString("jwt.key"))
 
-type Claims struct {
+type UserClaims struct {
 	UserId uint `json:"user_id"`
+	jwt.StandardClaims
+}
+
+type AdminClaims struct {
+	AdminId uint `json:"admin_id"`
 	jwt.StandardClaims
 }
 
@@ -23,7 +28,7 @@ type Claims struct {
 //
 func ReleaseUserToken(user model.User) (string, error) {
 	expirationTime := time.Now().Add(7 * 24 * time.Hour) // 有效期7天
-	claims := Claims{
+	claims := UserClaims{
 		UserId: user.ID,
 		StandardClaims: jwt.StandardClaims{
 			ExpiresAt: expirationTime.Unix(),
@@ -40,8 +45,35 @@ func ReleaseUserToken(user model.User) (string, error) {
 	return token, err
 }
 
-func ParseUserTokenString(tokenString string) (*jwt.Token, *Claims, error) {
-	claims := &Claims{}
+func ParseUserTokenString(tokenString string) (*jwt.Token, *UserClaims, error) {
+	claims := &UserClaims{}
+	token, err := jwt.ParseWithClaims(tokenString, claims, func(token *jwt.Token) (i interface{}, err error) {
+		return jwtKey, nil
+	})
+	return token, claims, err
+}
+
+func ReleaseAdminToken(admin model.Admin) (string, error) {
+	expirationTime := time.Now().Add(7 * 24 * time.Hour) // 有效期7天
+	claims := AdminClaims{
+		AdminId: admin.ID,
+		StandardClaims: jwt.StandardClaims{
+			ExpiresAt: expirationTime.Unix(),
+			IssuedAt:  time.Now().Unix(),
+			Issuer:    "northern air",
+			Subject:   "user token",
+		},
+	}
+	tokenClaims := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
+	token, err := tokenClaims.SignedString(jwtKey)
+	if err != nil {
+		return "", err
+	}
+	return token, err
+}
+
+func ParseAdminTokenString(tokenString string) (*jwt.Token, *AdminClaims, error) {
+	claims := &AdminClaims{}
 	token, err := jwt.ParseWithClaims(tokenString, claims, func(token *jwt.Token) (i interface{}, err error) {
 		return jwtKey, nil
 	})

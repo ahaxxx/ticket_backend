@@ -3,8 +3,10 @@ package controller
 import (
 	"github.com/gin-gonic/gin"
 	"golang.org/x/crypto/bcrypt"
+	"log"
 	"net/http"
 	"strconv"
+	"ticket-backend/common"
 	db "ticket-backend/database"
 	"ticket-backend/model"
 	"ticket-backend/response"
@@ -68,4 +70,53 @@ func AdminRegister(c *gin.Context) {
 	db.DB.Create(&admin)
 	// 返回结果
 	response.Response(c, http.StatusOK, 200, nil, "注册成功!")
+}
+
+func AdminLogin(c *gin.Context) {
+
+	// 获取参数
+	phone := c.PostForm("phone")
+	password := c.PostForm("password")
+
+	// 数据验证
+	if len(phone) != 11 {
+		response.Response(c, http.StatusUnprocessableEntity, 422, nil, "电话号码必须为11位!")
+		return
+	}
+
+	if len(password) < 6 { // 密码不能小于六位
+		response.Response(c, http.StatusUnprocessableEntity, 422, nil, "密码长度必须大于6位!")
+		return
+	}
+
+	// 判断账户是否存在
+	var admin model.Admin
+	db.DB.Where("phone=?", phone).First(&admin)
+	if admin.ID == 0 {
+		response.Response(c, http.StatusUnprocessableEntity, 422, nil, "用户不存在!")
+		return
+	}
+
+	// 判断密码是否正确
+
+	err := bcrypt.CompareHashAndPassword([]byte(admin.Password), []byte(password))
+
+	if err != nil {
+		response.Response(c, http.StatusBadRequest, 400, nil, "密码错误!")
+		return
+	}
+
+	// 发放token
+	token, err := common.ReleaseAdminToken(admin)
+	if err != nil {
+		response.Response(c, http.StatusInternalServerError, 500, nil, "token分发失败!")
+		log.Println("token generate error:%v", err)
+		return
+	}
+	// 返回结果
+	data := gin.H{
+		"token": token,
+	}
+	response.Success(c, data, "后台登录成功！")
+	return
 }
