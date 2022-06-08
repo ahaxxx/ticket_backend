@@ -28,3 +28,13 @@ func IsAdminNameExist(name string) bool {
 	}
 	return false
 }
+
+//
+//  UpdateAdminById
+//  @Description: 根据id修改管理员信息
+//  @param id
+//  @param admin
+//
+func UpdateAdminById(id uint, admin model.Admin) {
+	db.DB.Model(&model.User{}).Where("id=?", id).Update(&admin)
+}

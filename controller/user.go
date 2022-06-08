@@ -40,7 +40,6 @@ func UserRegister(c *gin.Context) {
 	if len(name) == 0 { // 如果没输入用户名，就随机给一个
 		name = utils.RandStr(10)
 	}
-	log.Println(name, password, phone)
 
 	if dao.IsUserPhoneExist(phone) {
 		response.Response(c, http.StatusUnprocessableEntity, 422, nil, "电话号码已经存在!")
@@ -129,4 +128,62 @@ func UserInfo(c *gin.Context) {
 		"user": dto.ToUserDto(user.(model.User)),
 	}
 	response.Success(c, data, "用户信息获取成功！")
+}
+
+//
+//  UserUpdate
+//  @Description: 用户信息修改
+//  @param c
+//
+func UserUpdate(c *gin.Context) {
+	// 获取表单内容
+	name := c.PostForm("name")
+	phone := c.PostForm("phone")
+	// 数据合法化验证
+	if len(phone) != 0 {
+		if len(phone) != 11 {
+			response.Response(c, http.StatusUnprocessableEntity, 422, nil, "电话号码必须为11位!")
+			return
+		}
+		if dao.IsUserPhoneExist(phone) {
+			response.Response(c, http.StatusUnprocessableEntity, 422, nil, "电话号码已经存在!")
+			return
+		}
+	}
+	// 获取用户ID
+	user, _ := c.Get("user")
+	id := dto.ToUserDto(user.(model.User)).Id
+	update := model.User{
+		Name:  name,
+		Phone: phone,
+	}
+	dao.UpdateUserById(id, update)
+	response.Response(c, http.StatusOK, 200, nil, "用户信息修改成功！")
+}
+
+//
+//  UserPasswordUpdate
+//  @Description: 用户密码修改接口
+//
+func UserPasswordUpdate(c *gin.Context) {
+	password := c.PostForm("password")
+	user, _ := c.Get("user")
+	id := dto.ToUserDto(user.(model.User)).Id
+	if len(password) != 0 {
+		if len(password) < 6 { // 密码不能小于六位
+			response.Response(c, http.StatusUnprocessableEntity, 422, nil, "密码长度必须大于6位!")
+			return
+		}
+	}
+	hashPass, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
+	if err != nil {
+		response.Response(c, http.StatusInternalServerError, 500, nil, "密码加密错误!")
+		return
+	}
+	update := model.User{
+		Password: string(hashPass),
+	}
+	dao.UpdateUserById(id, update)
+	// 返回结果
+	response.Response(c, http.StatusOK, 200, nil, "密码修改成功!")
 }

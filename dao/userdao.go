@@ -34,3 +34,7 @@ func IsUserNameExist(name string) bool {
 	}
 	return false
 }
+
+func UpdateUserById(id uint, user model.User) {
+	db.DB.Model(&model.User{}).Where("id=?", id).Update(&user)
+}
