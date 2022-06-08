@@ -29,6 +29,7 @@ func NewRouter() *gin.Engine {
 		v1.PUT("admin", middlewave.AdminAuthMiddleware(), controller.AdminUpdate)                  // 后台密码修改接口
 		v1.PUT("admin/password", middlewave.AdminAuthMiddleware(), controller.AdminPasswordUpdate) // 后台密码修改接口
 
+		v1.POST("company", middlewave.AdminAuthMiddleware(), controller.CreateCompany)
 	}
 	return r
 }
