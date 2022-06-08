@@ -9,7 +9,12 @@ import (
 	"ticket-backend/response"
 )
 
-func CreateCompany(c *gin.Context) {
+//
+//  CreateCompany
+//  @Description: 添加公司接口
+//  @param c
+//
+func CompanyCreate(c *gin.Context) {
 	// 参数获取
 	admin, _ := c.Get("admin")
 	name := c.PostForm("name")
@@ -32,4 +37,12 @@ func CreateCompany(c *gin.Context) {
 	}
 	db.DB.Create(&company)
 	response.Response(c, http.StatusOK, 200, nil, "公司添加成功")
+}
+
+func CompanyList(c *gin.Context) {
+	admin, _ := c.Get("admin")
+	auth := dto.ToAdminDto(admin.(model.Admin)).Auth
+	if auth == 1 {
+
+	}
 }
