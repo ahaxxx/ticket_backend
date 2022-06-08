@@ -14,6 +14,11 @@ import (
 	"ticket-backend/response"
 )
 
+//
+//  AdminRegister
+//  @Description: 管理员注册
+//  @param c
+//
 func AdminRegister(c *gin.Context) {
 
 	// 获取参数
@@ -71,6 +76,11 @@ func AdminRegister(c *gin.Context) {
 	response.Response(c, http.StatusOK, 200, nil, "注册成功!")
 }
 
+//
+//  AdminLogin
+//  @Description: 管理员登录
+//  @param c
+//
 func AdminLogin(c *gin.Context) {
 
 	// 获取参数
@@ -120,10 +130,80 @@ func AdminLogin(c *gin.Context) {
 	return
 }
 
+//
+//  AdminInfo
+//  @Description: 获取管理员信息
+//  @param c
+//
 func AdminInfo(c *gin.Context) {
 	admin, _ := c.Get("admin")
 	data := gin.H{
 		"admin": dto.ToAdminDto(admin.(model.Admin)),
 	}
 	response.Success(c, data, "用户信息获取成功！")
+}
+
+//
+//  AdminUpdate
+//  @Description: 修改管理员信息
+//  @param c
+//
+func AdminUpdate(c *gin.Context) {
+	// 获取表单内容
+	name := c.PostForm("name")
+	phone := c.PostForm("phone")
+	auth, err := strconv.Atoi(c.PostForm("auth"))
+	if err != nil {
+		response.Response(c, http.StatusUnprocessableEntity, 422, nil, "权限参数错误!")
+		return
+	}
+	// 数据合法化验证
+	if len(phone) != 0 {
+		if len(phone) != 11 {
+			response.Response(c, http.StatusUnprocessableEntity, 422, nil, "电话号码必须为11位!")
+			return
+		}
+		if dao.IsUserPhoneExist(phone) {
+			response.Response(c, http.StatusUnprocessableEntity, 422, nil, "电话号码已经存在!")
+			return
+		}
+	}
+	// 获取用户ID
+	admin, _ := c.Get("admin")
+	id := dto.ToAdminDto(admin.(model.Admin)).Id
+	update := model.Admin{
+		Name:  name,
+		Phone: phone,
+		Auth:  uint(auth),
+	}
+	dao.UpdateAdminById(id, update)
+	response.Response(c, http.StatusOK, 200, nil, "管理员信息修改成功！")
+}
+
+//
+//  AdminPasswordUpdate
+//  @Description: 修改管理员密码
+//  @param c
+//
+func AdminPasswordUpdate(c *gin.Context) {
+	password := c.PostForm("password")
+	admin, _ := c.Get("admin")
+	id := dto.ToAdminDto(admin.(model.Admin)).Id
+	if len(password) != 0 {
+		if len(password) < 6 { // 密码不能小于六位
+			response.Response(c, http.StatusUnprocessableEntity, 422, nil, "密码长度必须大于6位!")
+			return
+		}
+	}
+	hashPass, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
+	if err != nil {
+		response.Response(c, http.StatusInternalServerError, 500, nil, "密码加密错误!")
+		return
+	}
+	update := model.Admin{
+		Password: string(hashPass),
+	}
+	dao.UpdateAdminById(id, update)
+	// 返回结果
+	response.Response(c, http.StatusOK, 200, nil, "密码修改成功!")
 }

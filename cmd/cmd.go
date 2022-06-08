@@ -43,7 +43,7 @@ func Execute() error {
 		if err != nil {
 			return err
 		}
-		db.DB.AutoMigrate(&model.User{}, &model.Passenger{}, &model.Admin{})
+		db.DB.AutoMigrate(&model.User{}, &model.Passenger{}, &model.Admin{}, &model.Company{})
 		defer db.DB.Close()
 
 		r := router.NewRouter()

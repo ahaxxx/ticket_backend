@@ -23,9 +23,12 @@ func NewRouter() *gin.Engine {
 		v1.PUT("passenger", middlewave.UserAuthMiddleware(), controller.PassengerUpdate)     // 修改乘客信息
 		v1.DELETE("passenger", middlewave.UserAuthMiddleware(), controller.PassengerDelete)  // 删除乘客
 
-		v1.POST("admin/register", middlewave.AdminAuthMiddleware(), controller.AdminRegister) // 注册后台用户
-		v1.POST("admin/login", controller.AdminLogin)                                         // 后台用户登录
-		v1.GET("admin", middlewave.AdminAuthMiddleware(), controller.AdminInfo)               // 用户信息接口
+		v1.POST("admin/register", middlewave.AdminAuthMiddleware(), controller.AdminRegister)      // 注册后台用户
+		v1.POST("admin/login", controller.AdminLogin)                                              // 后台用户登录
+		v1.GET("admin", middlewave.AdminAuthMiddleware(), controller.AdminInfo)                    // 用户信息接口
+		v1.PUT("admin", middlewave.AdminAuthMiddleware(), controller.AdminUpdate)                  // 后台密码修改接口
+		v1.PUT("admin/password", middlewave.AdminAuthMiddleware(), controller.AdminPasswordUpdate) // 后台密码修改接口
+
 	}
 	return r
 }
