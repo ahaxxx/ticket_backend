@@ -8,5 +8,6 @@ type Admin struct {
 	Auth     uint   `gorm:"not null",json:"Auth"`
 	Password string `gorm:"type:varchar(255);not null",json:"password"`
 	Phone    string `gorm:"type:varchar(255);not null",json:"phone"`
-	Company  string `gorm:"type:varchar(255);not null",json:"company"`
+	Cid      uint   `gorm:"not null",json:"cid"`
+	Status   uint   `gorm:"not null",json:"status"`
 }
