@@ -3,6 +3,7 @@ package controller
 import (
 	"github.com/gin-gonic/gin"
 	"net/http"
+	"strconv"
 	"ticket-backend/dao"
 	db "ticket-backend/database"
 	"ticket-backend/dto"
@@ -62,4 +63,25 @@ func CompanyList(c *gin.Context) {
 		response.Response(c, http.StatusNotFound, 404, nil, "列表为空")
 	}
 	response.Response(c, http.StatusOK, 200, data, "公司列表获取成功")
+}
+
+func CompanyInfo(c *gin.Context) {
+	// 参数获取
+	admin, _ := c.Get("admin")
+	cid, err := strconv.Atoi(c.PostForm("cid"))
+	if err != nil {
+		response.Response(c, http.StatusUnprocessableEntity, 422, nil, "cid参数错误!")
+		return
+	}
+	// 权限验证
+	auth := dto.ToAdminDto(admin.(model.Admin)).Auth
+	if auth != 1 {
+		response.Response(c, http.StatusUnauthorized, 401, nil, "权限不够，只有超级管理员有权限查看公司信息！")
+		return
+	}
+	company := dao.GetCompanyByCid(uint(cid))
+	data := gin.H{
+		"company": company,
+	}
+	response.Success(c, data, "用户信息获取成功！")
 }

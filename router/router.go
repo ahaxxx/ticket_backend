@@ -29,10 +29,11 @@ func NewRouter() *gin.Engine {
 		v1.PUT("admin", middlewave.AdminAuthMiddleware(), controller.AdminUpdate)                  // 后台密码修改接口
 		v1.PUT("admin/password", middlewave.AdminAuthMiddleware(), controller.AdminPasswordUpdate) // 后台密码修改接口
 
-		v1.POST("company", middlewave.AdminAuthMiddleware(), controller.CompanyCreate)   // 公司创建接口
-		v1.GET("company/list", middlewave.AdminAuthMiddleware(), controller.CompanyList) // 获取公司列表接口，仅有超级管理员有权限
+		v1.POST("company", middlewave.AdminAuthMiddleware(), controller.CompanyCreate)    // 公司创建接口
+		v1.GET("company/list", middlewave.AdminAuthMiddleware(), controller.CompanyList)  // 获取公司列表接口，仅有超级管理员有权限
+		v1.POST("company/info", middlewave.AdminAuthMiddleware(), controller.CompanyInfo) // 获取公司信息接口
 		/*
-			v1.POST("company/info", middlewave.AdminAuthMiddleware(), controller.CompanyInfo) // 获取公司信息接口
+
 			v1.PUT("company", middlewave.AdminAuthMiddleware(), controller.CompanyUpdate)     // 修改公司信息接口
 			v1.DELETE("company", middlewave.AdminAuthMiddleware(), controller.CompanyDelete)  // 删除公司接口
 

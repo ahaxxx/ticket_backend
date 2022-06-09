@@ -19,3 +19,9 @@ func IsCompanyExist(name string) bool {
 	}
 	return false
 }
+
+func GetCompanyByCid(cid uint) model.Company {
+	var company model.Company
+	db.DB.Where("id=?", cid).Find(&company)
+	return company
+}
