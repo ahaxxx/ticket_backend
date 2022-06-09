@@ -3,6 +3,7 @@ package controller
 import (
 	"github.com/gin-gonic/gin"
 	"net/http"
+	"ticket-backend/dao"
 	db "ticket-backend/database"
 	"ticket-backend/dto"
 	"ticket-backend/model"
@@ -43,6 +44,16 @@ func CompanyList(c *gin.Context) {
 	admin, _ := c.Get("admin")
 	auth := dto.ToAdminDto(admin.(model.Admin)).Auth
 	if auth == 1 {
-
+		company := dao.GetCompanyList()
+		data := gin.H{
+			"companies": company,
+		}
+		if len(company) == 0 {
+			response.Response(c, http.StatusNotFound, 404, nil, "列表为空")
+		}
+		response.Response(c, http.StatusOK, 200, data, "乘客列表获取成功")
+	} else {
+		response.Response(c, http.StatusUnauthorized, 401, nil, "权限不够，只有超级管理员有权限查看公司列表！")
+		return
 	}
 }
