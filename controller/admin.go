@@ -127,6 +127,13 @@ func AdminLogin(c *gin.Context) {
 		return
 	}
 
+	// 判断用户状态
+
+	if admin.Status != 1 {
+		response.Response(c, http.StatusUnprocessableEntity, 422, nil, "该后台账户被禁用!")
+		return
+	}
+
 	// 发放token
 	token, err := common.ReleaseAdminToken(admin)
 	if err != nil {
