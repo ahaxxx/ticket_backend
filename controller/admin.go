@@ -30,7 +30,17 @@ func AdminRegister(c *gin.Context) {
 		response.Response(c, http.StatusUnprocessableEntity, 422, nil, "权限参数错误!")
 		return
 	}
-	company := c.PostForm("company")
+	cid, err := strconv.Atoi(c.PostForm("cid"))
+	if err != nil {
+		response.Response(c, http.StatusUnprocessableEntity, 422, nil, "公司参数错误!")
+		return
+	}
+
+	status, err := strconv.Atoi(c.PostForm("status"))
+	if err != nil {
+		response.Response(c, http.StatusUnprocessableEntity, 422, nil, "公司参数错误!")
+		return
+	}
 
 	// 数据验证
 	if len(phone) != 11 {
@@ -56,6 +66,7 @@ func AdminRegister(c *gin.Context) {
 		response.Response(c, http.StatusUnprocessableEntity, 422, nil, "用户名已经存在!")
 		return
 	}
+
 	// 对密码取哈希
 	hashPass, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
 	if err != nil {
@@ -69,7 +80,8 @@ func AdminRegister(c *gin.Context) {
 		Password: string(hashPass),
 		Phone:    phone,
 		Auth:     uint(auth),
-		Company:  company,
+		Cid:      uint(cid),
+		Status:   uint(status),
 	}
 	db.DB.Create(&admin)
 	// 返回结果
@@ -112,6 +124,13 @@ func AdminLogin(c *gin.Context) {
 
 	if err != nil {
 		response.Response(c, http.StatusBadRequest, 400, nil, "密码错误!")
+		return
+	}
+
+	// 判断用户状态
+
+	if admin.Status != 1 {
+		response.Response(c, http.StatusUnprocessableEntity, 422, nil, "该后台账户被禁用!")
 		return
 	}
 
