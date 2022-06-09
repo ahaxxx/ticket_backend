@@ -29,3 +29,8 @@ func GetCompanyByCid(cid uint) model.Company {
 func UpdateCompanyById(cid uint, company model.Company) {
 	db.DB.Model(&model.Company{}).Where("id=?", cid).Update(&company)
 }
+
+func DeleteCompanyById(cid uint) {
+	var company model.Company
+	db.DB.Where("id = ?", cid).Delete(&company)
+}

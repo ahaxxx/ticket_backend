@@ -108,3 +108,24 @@ func CompanyUpdate(c *gin.Context) {
 	dao.UpdateCompanyById(uint(cid), update)
 	response.Response(c, http.StatusOK, 200, nil, "公司信息修改成功！")
 }
+
+func CompanyDelete(c *gin.Context) {
+	// 参数获取
+	admin, _ := c.Get("admin")
+	cid, err := strconv.Atoi(c.PostForm("cid"))
+	if err != nil {
+		response.Response(c, http.StatusUnprocessableEntity, 422, nil, "id参数错误!")
+		return
+	}
+
+	// 权限验证
+	auth := dto.ToAdminDto(admin.(model.Admin)).Auth
+	if auth != 1 {
+		response.Response(c, http.StatusUnauthorized, 401, nil, "权限不够，只有超级管理员有权限修改公司信息！")
+		return
+	}
+
+	// 删除
+	dao.DeleteCompanyById(uint(cid))
+	response.Response(c, http.StatusOK, 200, nil, "公司信息删除成功！")
+}
