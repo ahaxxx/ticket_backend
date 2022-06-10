@@ -2,7 +2,6 @@ package model
 
 import (
 	"gorm.io/gorm"
-	"time"
 )
 
 type Plane struct {
@@ -13,7 +12,7 @@ type Plane struct {
 	Seat        int     `gorm:"not null",json:"seat"`
 	Departure   string  `gorm:"type:varchar(255);not null",json:"departure"`
 	Arrival     string  `gorm:"type:varchar(255);not null",json:"arrival"`
-	TakeoffTime time.Time
+	TakeoffTime uint    `gorm:"not null"`
 	Company     Company `json:"company"`
 	CompanyId   int     `json:"company_id"`
 }
