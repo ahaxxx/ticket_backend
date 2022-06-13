@@ -28,7 +28,11 @@ func TicketCreate(c *gin.Context) {
 	plane := dao.GetPlaneById(uint(planeid))
 	price := plane.Price
 	status := 1
-
+	if plane.Seat <= 0 {
+		response.Response(c, http.StatusNotFound, 404, nil, "该航班已售罄!")
+		return
+	}
+	Seat := plane.Seat - 1
 	// 数据封装
 	ticket := model.Ticket{
 		PassId:  uint(passid),
@@ -37,7 +41,12 @@ func TicketCreate(c *gin.Context) {
 		Price:   price,
 		Status:  uint(status),
 	}
+
+	update := model.Plane{
+		Seat: Seat,
+	}
 	db.DB.Create(&ticket)
+	dao.UpdatePlaneById(uint(planeid), update)
 	// 返回结果
 	response.Response(c, http.StatusOK, 200, nil, "订单提交成功!")
 }
