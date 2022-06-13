@@ -88,7 +88,14 @@ func PlaneUpdate(c *gin.Context) {
 }
 
 func PlaneList(c *gin.Context) {
-
+	planes := dao.GetPlaneList()
+	data := gin.H{
+		"planes": planes,
+	}
+	if len(planes) == 0 {
+		response.Response(c, http.StatusNotFound, 404, nil, "列表为空")
+	}
+	response.Response(c, http.StatusOK, 200, data, "航班列表获取成功")
 }
 
 func PlaneSearch(c *gin.Context) {
