@@ -45,6 +45,7 @@ func NewRouter() *gin.Engine {
 		v1.POST("ticket", middlewave.UserAuthMiddleware(), controller.TicketCreate)           // 创建订单接口
 		v1.GET("ticket/list", middlewave.UserAuthMiddleware(), controller.TicketList)         // 获取订单列表
 		v1.POST("ticket/confirm", middlewave.AdminAuthMiddleware(), controller.TicketConfirm) // 确认订单出票
+		v1.POST("ticket/cancel", middlewave.UserAuthMiddleware(), controller.TicketCancel)    // 订单取消
 		// 需要添加航班模块，机票订单模块
 		// 技术难点是需要学习一下多表联动问题
 	}

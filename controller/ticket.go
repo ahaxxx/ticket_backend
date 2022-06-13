@@ -69,7 +69,7 @@ func TicketConfirm(c *gin.Context) {
 	admin, _ := c.Get("admin")
 	id, err := strconv.Atoi(c.PostForm("id"))
 	if err != nil {
-		response.Response(c, http.StatusUnprocessableEntity, 422, nil, "passid参数错误!")
+		response.Response(c, http.StatusUnprocessableEntity, 422, nil, "id参数错误!")
 		return
 	}
 	// 权限验证
@@ -87,4 +87,28 @@ func TicketConfirm(c *gin.Context) {
 	// 数据更新
 	dao.UpdateTicketById(uint(id), update)
 	response.Response(c, http.StatusOK, 200, nil, "订单确认出票成功!")
+}
+
+func TicketCancel(c *gin.Context) {
+	user, _ := c.Get("user")
+	id, err := strconv.Atoi(c.PostForm("id"))
+	if err != nil {
+		response.Response(c, http.StatusUnprocessableEntity, 422, nil, "id参数错误!")
+		return
+	}
+	// 权限验证
+	uid := dto.ToUserDto(user.(model.User)).Id
+	ticket := dao.GetTicketById(uint(id))
+	userid := ticket.Uid
+	if uid != userid {
+		response.Response(c, http.StatusUnprocessableEntity, 401, nil, "权限错误!")
+		return
+	}
+	// 数据封装
+	update := model.Ticket{
+		Status: uint(3),
+	}
+	// 数据更新
+	dao.UpdateTicketById(uint(id), update)
+	response.Response(c, http.StatusOK, 200, nil, "订单取消成功!")
 }
