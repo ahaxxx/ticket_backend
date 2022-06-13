@@ -37,6 +37,7 @@ func NewRouter() *gin.Engine {
 
 		v1.POST("plane", middlewave.AdminAuthMiddleware(), controller.PlaneCreate)   // 创建航班接口，仅有后台用户有权限创建
 		v1.POST("plane/info", controller.PlaneInfo)                                  // 查看航班信息
+		v1.POST("plane/search", controller.PlaneSearch)                              // 删除航班接口
 		v1.GET("plane/list", controller.PlaneList)                                   // 获取航班列表接口
 		v1.DELETE("plane", middlewave.AdminAuthMiddleware(), controller.PlaneDelete) // 删除航班接口
 

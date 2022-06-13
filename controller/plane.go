@@ -101,8 +101,16 @@ func PlaneList(c *gin.Context) {
 func PlaneSearch(c *gin.Context) {
 	departure := c.PostForm("departure")
 	arrival := c.PostForm("arrival")
-	takeoffTime := c.PostForm("takeoffTime")
-
+	take_off_time, err := strconv.Atoi(c.PostForm("takeofftime"))
+	if err != nil {
+		response.Response(c, http.StatusUnprocessableEntity, 422, nil, "takeofftime参数错误!")
+		return
+	}
+	plane := dao.SearchPlaneByDAT(departure, arrival, uint(take_off_time))
+	data := gin.H{
+		"plane": plane,
+	}
+	response.Response(c, http.StatusOK, 200, data, "航班信息查询成功！")
 }
 
 func PlaneInfo(c *gin.Context) {
