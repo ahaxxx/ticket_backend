@@ -54,3 +54,28 @@ func TicketList(c *gin.Context) {
 	}
 	response.Response(c, http.StatusOK, 200, data, "航班列表获取成功")
 }
+
+func TicketConfirm(c *gin.Context) {
+	// 获取参数
+	admin, _ := c.Get("admin")
+	id, err := strconv.Atoi(c.PostForm("id"))
+	if err != nil {
+		response.Response(c, http.StatusUnprocessableEntity, 422, nil, "passid参数错误!")
+		return
+	}
+	// 权限验证
+	cid := dto.ToAdminDto(admin.(model.Admin)).Cid
+	ticket := dao.GetTicketById(uint(id))
+	plane := dao.GetPlaneById(ticket.PlaneId)
+	if cid != uint(plane.CompanyId) {
+		response.Response(c, http.StatusUnprocessableEntity, 401, nil, "权限错误!")
+		return
+	}
+	// 数据封装
+	update := model.Ticket{
+		Status: uint(2),
+	}
+	// 数据更新
+	dao.UpdateTicketById(uint(id), update)
+	response.Response(c, http.StatusOK, 200, nil, "订单确认出票成功!")
+}
