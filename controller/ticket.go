@@ -42,6 +42,15 @@ func TicketCreate(c *gin.Context) {
 	response.Response(c, http.StatusOK, 200, nil, "订单提交成功!")
 }
 
-func TicketInfo(c *gin.Context) {
-
+func TicketList(c *gin.Context) {
+	user, _ := c.Get("user")
+	uid := dto.ToUserDto(user.(model.User)).Id
+	tickets := dao.GetTicketListByUid(uid)
+	data := gin.H{
+		"tickets": tickets,
+	}
+	if len(tickets) == 0 {
+		response.Response(c, http.StatusNotFound, 404, nil, "列表为空")
+	}
+	response.Response(c, http.StatusOK, 200, data, "航班列表获取成功")
 }
