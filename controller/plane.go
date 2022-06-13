@@ -78,6 +78,41 @@ func PlaneCreate(c *gin.Context) {
 		TakeoffTime: uint(take_off_time),
 		CompanyId:   int(companyId),
 	}
+	// 数据上传
 	db.DB.Create(&plane)
 	response.Response(c, http.StatusOK, 200, nil, "航班创建成功！")
+}
+
+func PlaneUpdate(c *gin.Context) {
+
+}
+
+func PlaneList(c *gin.Context) {
+	planes := dao.GetPlaneList()
+	data := gin.H{
+		"planes": planes,
+	}
+	if len(planes) == 0 {
+		response.Response(c, http.StatusNotFound, 404, nil, "列表为空")
+	}
+	response.Response(c, http.StatusOK, 200, data, "航班列表获取成功")
+}
+
+func PlaneSearch(c *gin.Context) {
+
+}
+
+func PlaneInfo(c *gin.Context) {
+	id, err := strconv.Atoi(c.PostForm("pid"))
+	if err != nil {
+		response.Response(c, http.StatusUnprocessableEntity, 422, nil, "id参数错误!")
+		return
+	}
+	var pid = uint(id)
+
+	plane := dao.GetPlaneById(pid)
+	data := gin.H{
+		"plane": plane,
+	}
+	response.Response(c, http.StatusOK, 200, data, "航班信息查询成功！")
 }

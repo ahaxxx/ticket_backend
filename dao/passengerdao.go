@@ -13,7 +13,7 @@ func GetPassengerListByUid(uid uint) []model.Passenger {
 
 func GetPassengerById(id uint) model.Passenger {
 	var passenger model.Passenger
-	db.DB.Where("id=?", id).Find(&passenger)
+	db.DB.Where("id=?", id).First(&passenger)
 	return passenger
 }
 
