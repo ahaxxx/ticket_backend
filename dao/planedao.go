@@ -13,3 +13,9 @@ func IsPlaneNumExist(name string) bool {
 	}
 	return false
 }
+
+func GetPlaneById(id uint) model.Plane {
+	var plane model.Plane
+	db.DB.Where("id=?", id).Find(&plane)
+	return plane
+}

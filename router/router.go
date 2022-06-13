@@ -36,6 +36,7 @@ func NewRouter() *gin.Engine {
 		v1.DELETE("company", middlewave.AdminAuthMiddleware(), controller.CompanyDelete)  // 删除公司接口
 
 		v1.POST("plane", middlewave.AdminAuthMiddleware(), controller.PlaneCreate) // 创建航班接口，仅有后台用户有权限创建
+		v1.POST("plane/info", controller.PlaneInfo)                                // 查看航班信息
 
 		// 需要添加航班模块，机票订单模块
 		// 技术难点是需要学习一下多表联动问题
