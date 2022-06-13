@@ -99,6 +99,9 @@ func PlaneList(c *gin.Context) {
 }
 
 func PlaneSearch(c *gin.Context) {
+	departure := c.PostForm("departure")
+	arrival := c.PostForm("arrival")
+	takeoffTime := c.PostForm("takeoffTime")
 
 }
 
@@ -115,4 +118,24 @@ func PlaneInfo(c *gin.Context) {
 		"plane": plane,
 	}
 	response.Response(c, http.StatusOK, 200, data, "航班信息查询成功！")
+}
+
+func PlaneDelete(c *gin.Context) {
+	admin, _ := c.Get("admin")
+	id, err := strconv.Atoi(c.PostForm("id"))
+	if err != nil {
+		response.Response(c, http.StatusUnprocessableEntity, 422, nil, "id参数错误!")
+		return
+	}
+	var idn = uint(id)
+	// 权限验证
+	plane := dao.GetPlaneById(idn)
+	cid := dto.ToAdminDto(admin.(model.Admin)).Cid
+	if cid != uint(plane.CompanyId) {
+		response.Response(c, http.StatusUnauthorized, 401, nil, "权限不够！")
+		return
+	}
+	// 删除记录
+	dao.DeletePlaneById(idn)
+	response.Response(c, http.StatusOK, 200, nil, "航班信息删除成功！")
 }

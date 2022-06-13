@@ -25,3 +25,8 @@ func GetPlaneList() []model.Plane {
 	db.DB.Find(&plane)
 	return plane
 }
+
+func DeletePlaneById(id uint) model.Plane {
+	var plane model.Plane
+	db.DB.Where("id = ?", id).Delete(&plane)
+}
